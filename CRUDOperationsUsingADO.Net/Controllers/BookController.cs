@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CRUDOperationsUsingADO.Net.Data;
+//using CRUDOperationsUsingADO.Net.Data;
 using CRUDOperationsUsingADO.Net.Models;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using Microsoft.IdentityModel.Tokens;
+using static CRUDOperationsUsingADO.Net.Helper;
 
 namespace CRUDOperationsUsingADO.Net.Controllers
 {
@@ -22,11 +24,12 @@ namespace CRUDOperationsUsingADO.Net.Controllers
             this._configuration = configuration;
         }
 
+
         // GET: Book
         public IActionResult Index()
         {
             DataTable dtbl = new DataTable();
-            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("BookConnection")))
             {
                 sqlConnection.Open();
                 SqlDataAdapter sqlDa = new SqlDataAdapter("BookViewAll", sqlConnection);
@@ -36,47 +39,8 @@ namespace CRUDOperationsUsingADO.Net.Controllers
             return View(dtbl);                        
         }
 
-        //// GET: Book/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null || _context.BookViewModel == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var bookViewModel = await _context.BookViewModel
-        //        .FirstOrDefaultAsync(m => m.BookID == id);
-        //    if (bookViewModel == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(bookViewModel);
-        //}
-
-        //// GET: Book/Create
-        //public IActionResult Create()
-        //{
-        //    return View();
-        //}
-
-        //// POST: Book/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("BookID,Title,Author,Price")] BookViewModel bookViewModel)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(bookViewModel);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(bookViewModel);
-        //}
-
         // GET: Book/Edit/5
+        [NoDirectAccess]
         public IActionResult AddOrEdit(int? id)
         {
             BookViewModel bookViewModel = new BookViewModel();
@@ -95,7 +59,7 @@ namespace CRUDOperationsUsingADO.Net.Controllers
             if (ModelState.IsValid)
             {
                 //Sql Connection
-                using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+                using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("BookConnection")))
                 {
                     sqlConnection.Open();
                     SqlCommand sqlCmd = new SqlCommand("BookAddOrEdit", sqlConnection);
@@ -106,9 +70,11 @@ namespace CRUDOperationsUsingADO.Net.Controllers
                     sqlCmd.Parameters.AddWithValue("Price", bookViewModel.Price);
                     sqlCmd.ExecuteNonQuery();
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(bookViewModel);
+                return Json(new { isValid = true, redirectToUrl = Url.Action("Index", "Book") });
+                //return Json(new { isValid = true, html = Helper.RenderRazorViewToString(this, "Index") });
+            }           
+            return Json(new {isValid= false,html = Helper.RenderRazorViewToString(this,"AddOrEdit", bookViewModel) });
+            //return Json(new { isValid = false, redirectToUrl = Url.Action("AddOrEdit", bookViewModel) });
         }
 
         // GET: Book/Delete/5
@@ -123,7 +89,7 @@ namespace CRUDOperationsUsingADO.Net.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("BookConnection")))
             {
                 sqlConnection.Open();
                 SqlCommand sqlCmd = new SqlCommand("BookDeleteByID", sqlConnection);
@@ -131,13 +97,14 @@ namespace CRUDOperationsUsingADO.Net.Controllers
                 sqlCmd.Parameters.AddWithValue("BookID", id);
                 sqlCmd.ExecuteNonQuery();
             }
-            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Index));            
+            return Json(new { redirectToUrl = Url.Action("Index", "Book") });
         }
 
         public BookViewModel FetchBookByID(int? id)
         {
             BookViewModel bookViewModel = new BookViewModel();
-            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("DevConnection")))
+            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("BookConnection")))
             {
                 DataTable dtbl = new DataTable();
                 sqlConnection.Open();

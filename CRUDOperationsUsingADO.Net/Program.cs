@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CRUDOperationsUsingADO.Net.Data;
+//using CRUDOperationsUsingADO.Net.Data;
 var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<CRUDOperationsUsingADONetContext>(options =>
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("CRUDOperationsUsingADONetContext") ?? throw new InvalidOperationException("Connection string 'CRUDOperationsUsingADONetContext' not found.")));

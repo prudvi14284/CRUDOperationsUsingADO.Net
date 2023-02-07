@@ -8,7 +8,7 @@
     <h1 class="text-center">@ViewData["Title"]</h1>
 </div>
 
-<table class="table table-bordered">
+<table class="table table-bordered" id="datatable">
     <thead class="thead-light">
         <tr>
             <th>
@@ -21,7 +21,7 @@
                 Price
             </th>
             <th>
-                <a asp-action="AddOrEdit">Create New</a>
+                <a onclick="showInPopup('@Url.Action("AddOrEdit","Book",null,Context.Request.Scheme)')" class="btn btn-success text-white"><i class="fas fa-random"></i>Create New Book</a>
             </th>
         </tr>
     </thead>
@@ -29,7 +29,7 @@
         @for (int i = 0; i < Model.Rows.Count; i++)
         {
 
-            <tr>
+            <tr class="@(((int)Model.Rows[i]["Price"]) % 2 == 0 ? "even" : "odd")">
                 <td>
                     @Model.Rows[i]["Title"]
                 </td>
@@ -40,10 +40,38 @@
                     @Model.Rows[i]["Price"]
                 </td>
                 <td>
-                    <a asp-action="AddOrEdit" asp-route-id="@Model.Rows[i]["BookID"]">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@Model.Rows[i]["BookID"]">Delete</a>
+                    <a onclick="showInPopup('@Url.Action("AddOrEdit","Book",new{id = @Model.Rows[i]["BookID"]},Context.Request.Scheme)')" class="btn btn-info text-white"><i class="fas fa-pencil-alt"></i>Edit</a>
+                    <form asp-action="Delete" asp-route-id="@Model.Rows[i]["BookID"]" onsubmit="return jQueryAjaxDelete(this)" class="d-inline">
+                        <input type="hidden" asp-for="@Model.Rows[i]["BookID"]" />
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section scripts{
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#datatable').DataTable( {
+                "searching": false
+                //"paging": true,
+                //"info": true,
+                //"lengthChange": true
+            } );
+        } );
+    </script>
+}
+
+
+
+
+
+
+
