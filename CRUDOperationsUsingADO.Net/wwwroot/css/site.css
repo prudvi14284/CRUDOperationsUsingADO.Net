@@ -22,9 +22,9 @@ body {
 }
 
 .even {
-    background-color: lightgreen;
+    background-color: lightgreen !important;
 }
 
 .odd {
-    background-color: lightgrey;
+    background-color: lightgrey !important;
 }
