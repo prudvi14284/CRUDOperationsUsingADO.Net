@@ -4,6 +4,9 @@
     ViewData["Title"] = "List of Books";
 }
 
+@*<a asp-action="DownloadPDF" class="btn btn-primary">Download PDF</a>*@
+<a asp-action="DownloadPDF" class="btn btn-primary">Download PDF</a>
+
 <div class="jumbotron">
     <h1 class="text-center">@ViewData["Title"]</h1>
 </div>
@@ -45,6 +48,7 @@
                         <input type="hidden" asp-for="@Model.Rows[i]["BookID"]" />
                         <input type="submit" value="Delete" class="btn btn-danger" />
                     </form>
+                    
                 </td>
             </tr>
         }
@@ -52,19 +56,35 @@
 </table>
 
 @section scripts{
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.css" />    
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.13.2/datatables.min.js"></script>
+    @*<script src="~/js/jquery/jquery.min.js"></script>*@
     
     <script>
         $(document).ready(function() {
             $('#datatable').DataTable( {
                 "searching": false
+                //"sorting" : false
                 //"paging": true,
                 //"info": true,
                 //"lengthChange": true
             } );
         } );
     </script>
+
+    @*<script type="text/javascript">
+        $(document).ready(function (){
+            $getJSON("../Books",function(books){
+                $.map(books,function(book){
+                    $("#tblBooks tbody").append("<tr><td>" + book.title + "</td><td>" + book.author + "</td><td>"+ book.price+"</td></tr>");
+                });
+            });
+
+            $("#btnPrint").click(function (){
+                window.print();
+            });
+        });
+    </script>*@
 }
 
 

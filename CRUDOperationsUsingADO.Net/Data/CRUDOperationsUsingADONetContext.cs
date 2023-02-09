@@ -9,7 +9,7 @@
 //{
 //    public class CRUDOperationsUsingADONetContext : DbContext
 //    {
-//        public CRUDOperationsUsingADONetContext(DbContextOptions<CRUDOperationsUsingADONetContext> options)
+//        public CRUDOperationsUsingADONetContext (DbContextOptions<CRUDOperationsUsingADONetContext> options)
 //            : base(options)
 //        {
 //        }

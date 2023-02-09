@@ -11,6 +11,11 @@ using Microsoft.Data.SqlClient;
 using System.Data;
 using Microsoft.IdentityModel.Tokens;
 using static CRUDOperationsUsingADO.Net.Helper;
+using System.Drawing.Printing;
+using System.Xml.Linq;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 
 namespace CRUDOperationsUsingADO.Net.Controllers
 {
@@ -101,6 +106,59 @@ namespace CRUDOperationsUsingADO.Net.Controllers
             return Json(new { redirectToUrl = Url.Action("Index", "Book") });
         }
 
+        //// GET: Book/DownloadPDF/5
+        public IActionResult DownloadPDF()
+        {
+            DataTable dtbl = new DataTable();
+            using (SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("BookConnection")))
+            {
+                sqlConnection.Open();
+                SqlDataAdapter sqlDa = new SqlDataAdapter("SELECT * FROM Books ORDER BY Title, Author, Price", sqlConnection);
+                sqlDa.Fill(dtbl);
+            }
+
+            return File(GeneratePDF(dtbl), "application/pdf", "Books.pdf");
+        }
+
+        private byte[] GeneratePDF(DataTable dataTable)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 10f, 0f);
+                PdfWriter.GetInstance(pdfDoc, stream);
+                pdfDoc.Open();
+
+                var paragraph = new Paragraph("Book Information")
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingAfter = 10
+                };
+
+                PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count);
+                pdfTable.WidthPercentage = 100;
+
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    PdfPCell cell = new PdfPCell(new Phrase(column.ColumnName));
+                    cell.BackgroundColor = new BaseColor(240, 240, 240);
+                    pdfTable.AddCell(cell);
+                }
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    foreach (var item in row.ItemArray)
+                    {
+                        pdfTable.AddCell(item.ToString());
+                    }
+                }
+
+                pdfDoc.Add(pdfTable);
+                pdfDoc.Close();
+
+                return stream.ToArray();
+            }
+        }
+
         public BookViewModel FetchBookByID(int? id)
         {
             BookViewModel bookViewModel = new BookViewModel();
@@ -121,6 +179,6 @@ namespace CRUDOperationsUsingADO.Net.Controllers
                 }
                 return bookViewModel;
             }
-        }
+        }  
     }
 }

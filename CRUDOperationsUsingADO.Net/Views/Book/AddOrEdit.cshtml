@@ -47,34 +47,35 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
-<script>
-    $(document).ready(function () {
-        $('form').validate({
-            rules: {
-                Title: {
-                    required: true
+
+    <script>
+        $(document).ready(function () {
+            $('form').validate({
+                rules: {
+                    Title: {
+                        required: true
+                    },
+                    Author: {
+                        required: true
+                    },
+                    Price: {
+                        required: true,
+                        number: true
+                    }
                 },
-                Author: {
-                    required: true
-                },
-                Price: {
-                    required: true,
-                    number: true
+                messages: {
+                    Title: {
+                        required: 'Title is required'
+                    },
+                    Author: {
+                        required: 'Author is required'
+                    },
+                    Price: {
+                        required: 'Price is required',
+                        number: 'Price must be a valid number'
+                    }
                 }
-            },
-            messages: {
-                Title: {
-                    required: 'Title is required'
-                },
-                Author: {
-                    required: 'Author is required'
-                },
-                Price: {
-                    required: 'Price is required',
-                    number: 'Price must be a valid number'
-                }
-            }
+            });
         });
-    });
-</script>
+    </script>
+}
